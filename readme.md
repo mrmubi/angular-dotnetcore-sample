@@ -1,2 +1,2 @@
-#Angular Dotnet Core Sample
+# Angular Dotnet Core Sample
 This sample implements Angular and .NetCore
