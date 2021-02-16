@@ -36,4 +36,8 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 3.0.0
 
 dotnet ef migrations add Initial
 
+dotnet ef database drop --force
+
+npm install in the ClientApp
+
 
