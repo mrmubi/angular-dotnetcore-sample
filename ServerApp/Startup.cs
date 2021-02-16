@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ServerApp.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+
 
 namespace ServerApp
 {
@@ -24,12 +28,28 @@ namespace ServerApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            string connectionString =
+               Configuration["ConnectionStrings:DefaultConnection"];
+            services.AddDbContext<DataContext>(options =>
+                options.UseSqlServer(connectionString));
+
+            services.AddControllersWithViews()
+                .AddJsonOptions(opts => {
+                    opts.JsonSerializerOptions.IgnoreNullValues = true;
+                });
+
             services.AddRazorPages();
+
+
+            services.AddSwaggerGen(options => {
+                options.SwaggerDoc("v1",
+                    new OpenApiInfo { Title = "SportsStore API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, 
+            IServiceProvider services)
         {
             if (env.IsDevelopment())
             {
@@ -55,6 +75,11 @@ namespace ServerApp
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
+
+            app.UseSwagger(); 
+            app.UseSwaggerUI(options => 
+            { options.SwaggerEndpoint("/swagger/v1/swagger.json", "SportsStore API"); });
+
             //Angular Init - inbuilt
             /*
             app.UseSpa(spa =>
@@ -76,6 +101,10 @@ namespace ServerApp
                 {
                     spa.Options.SourcePath = "../ClientApp";
                     spa.UseAngularCliServer("start");
+
+                    //Seed data // cmd => dotnet ef migrations add Initial
+
+                    SeedData.SeedDatabase(services.GetRequiredService<DataContext>());
                 }
             });
 

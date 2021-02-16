@@ -6,21 +6,23 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ServerApp.Models;
+using System.Linq;
 
 namespace ServerApp.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private DataContext context;
+        public HomeController(ILogger<HomeController> logger, DataContext ctx)
         {
             _logger = logger;
+            context = ctx;
         }
 
         public IActionResult Index()
         {
-            return View();
+            return View(context.Products.First());
         }
 
         public IActionResult Privacy()
