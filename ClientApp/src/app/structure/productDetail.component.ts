@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { Repository } from "../models/repository";
 import { Product } from "../models/product.model";
 @Component({
-  selector: "product-table",
-  templateUrl: "./productTable.component.html"
+  selector: "product-detail",
+  templateUrl: "productDetail.component.html"
 })
-export class ProductTableComponent {
+export class ProductDetailComponent {
   constructor(private repo: Repository) { }
-  get products(): Product[] {
-    return this.repo.products;
+  get product(): Product {
+    return this.repo.product;
   }
 }
