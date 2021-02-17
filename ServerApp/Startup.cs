@@ -73,6 +73,14 @@ namespace ServerApp
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapControllerRoute(
+           name: "angular_fallback",
+             pattern: "{target:regex(store)}/{*catchall}",
+           defaults: new { controller = "Home", action = "Index" });
+
+                endpoints.MapRazorPages();
+
             });
 
 
