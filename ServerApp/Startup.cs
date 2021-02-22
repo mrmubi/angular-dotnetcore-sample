@@ -13,6 +13,10 @@ using ServerApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
+
 
 namespace ServerApp
 {
@@ -61,6 +65,12 @@ namespace ServerApp
             });
 
 
+            services.AddResponseCompression(opts => {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,6 +90,14 @@ namespace ServerApp
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                RequestPath = "/blazor",
+                FileProvider = new PhysicalFileProvider(
+                   Path.Combine(Directory.GetCurrentDirectory(),
+                       "../BlazorApp/wwwroot"))
+            });
+
             app.UseSession();
 
 
@@ -98,10 +116,15 @@ namespace ServerApp
              pattern: "{target:regex(store)}/{*catchall}",
            defaults: new { controller = "Home", action = "Index" });
 
+            //    endpoints.MapFallbackToClientSideBlazor<BlazorApp
+            //        .Startup>("blazor/{*path:nonfile}", "index.html");
+
                 endpoints.MapRazorPages();
 
             });
 
+          //  app.Map("/blazor", opts =>
+            //    opts.UseClientSideBlazorFiles<BlazorApp.Startup>());
 
             app.UseSwagger(); 
             app.UseSwaggerUI(options => 
